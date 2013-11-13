@@ -1,4 +1,4 @@
 GOODPARTS EXAMPLES
 ==================
 
-Specs to refresh javascript good parts :)
+Refreshing javascript good parts in automated fashion :)
