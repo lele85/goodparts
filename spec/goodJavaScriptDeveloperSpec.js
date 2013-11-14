@@ -151,13 +151,14 @@ describe("A good JavaScript developer", function() {
     });
 
     it("should know that for in statements enumerates object properties (even the prototype chain ones)", function() {
+        var key;
         var Cat = function(name) {
             this.name = name;
         };
         Cat.prototype.meow = function() {
             return "meow! I'm" + this.name;
-        }
-        var cat = new Cat();
+        };
+        var cat = new Cat("Fluffy");
         var numberOfProperties = 0;
         for (key in cat) {
             numberOfProperties += 1;
@@ -166,13 +167,14 @@ describe("A good JavaScript developer", function() {
     });
 
     it("should know that she can exclude prototype properties using hasOwnProperties", function() {
+        var key;
         var Cat = function(name) {
             this.name = name;
         };
         Cat.prototype.meow = function() {
             return "meow! I'm" + this.name;
-        }
-        var cat = new Cat();
+        };
+        var cat = new Cat("Fluffy");
         var numberOfProperties = 0;
         for (key in cat) {
             if (cat.hasOwnProperty(key)) {
@@ -181,32 +183,80 @@ describe("A good JavaScript developer", function() {
         }
         expect(numberOfProperties).toBe(1);
     });
+    
+    it("should know that she can break to a labelled loop", function(){
+        loop1:
+        while (true){
+            while(true){
+                while(true){
+                    break loop1;
+                }
+            }
+        }
+        expect(true).toBe(true);
+    });
+    
+    it("should be aware that the compiler adds ; in unexpected ways", function(){
+       var hello = function(){
+           return //Compiler adds ; here
+           "hello world";
+       };
+       expect(typeof hello() === 'undefined').toBe(true);
+    });
+    
+    it("should know operator precedences and use parenthesys to avoid confusion", function(){
+        expect(1 + 2 * 3 - 12 + -2 * 4 * -1).toBe(3);
+        expect(false !== true && true ).toBe(true);
+        expect(true && false || true ).toBe(true);
+    });
+    
+    it("should know that possible types in javascript are 'number' 'string' 'boolean' 'object' 'function' and 'undefined' and some are wrong", function(){
+       expect(typeof []).toBe('object');
+       expect(typeof null).toBe('object');
+       expect(typeof 1).toBe('number');
+       expect(typeof Infinity).toBe('number');
+       expect(typeof NaN).toBe('number');
+       expect(typeof "").toBe('string');
+       expect(typeof false).toBe('boolean');
+       expect(typeof Object.prototype.hasOwnProperty).toBe("function");
+       expect(typeof undefined).toBe('undefined');
+    });
+    
+    it("should know that a function literal can be anonymous or named, and you can use name for recursion", function(){
+        var exit =  false;
+        var hello = function salutation (){
+            if(exit){ return "hello world";}
+            exit = true;
+            return salutation();
+        };    
+        expect(hello()).toBe("hello world");
+    });
+    
+    it("should know that can use || to fill in default values", function(){
+       var salutation = {
+           italian : "ciao",
+           english : "hello"
+       };
+       
+       expect(salutation.italian).toBe("ciao");
+       expect(salutation["english"]).toBe("hello");
+       expect(salutation.spanish || "not supported").toBe("not supported");
+    });
+    
+    it("should know that can use && to protect from undefined access", function(){
+       var salutation = {
+           italian : {
+               always : "ciao",
+               morning : "buona mattina"
+           },
+           english : {
+               always : "hello",
+               morning : "good morning"
+           }
+       };
+       
+       expect(salutation.italian.always).toBe("ciao");
+       expect(salutation["english"]["morning"]).toBe("good morning");
+       expect((salutation.spanish && salutation.spanish.morning) || "not supported").toBe("not supported");
+    });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
