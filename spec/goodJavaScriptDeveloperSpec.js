@@ -105,6 +105,76 @@ describe("A good JavaScript developer", function(){
 		if (0){ expect(false).toBe(true);} else {expect(true).toBe(true);}
 	});
 
+	it("should know that switch statement check for exact match", function(){
+		var exact;
+		var variable = "12";
+		switch (variable) {
+			case 12:
+				exact = false;
+				break;
+			case "12":
+				exact = true;
+				break;
+			default :
+				break;
+		}
+
+		expect(exact).toBe(true);
+	});
+
+	it("should know that switch statement can fall if you don't provide break statement", function(){
+		var  fall;
+		var variable = "12";
+		switch (variable) {
+			case "12":
+				fall = false;
+			case "12":
+				fall = true;
+				break;
+			default :
+				break;
+		}
+
+		expect(fall).toBe(true);
+	});
+
+	it("should know that for in statements enumerates object properties (even the prototype chain ones)", function(){
+		var Cat =  function(name){
+			this.name = name;
+		};
+
+		Cat.prototype.meow = function(){
+			return "meow! I'm" + this.name;
+		}
+
+		var cat = new Cat();
+
+		var numberOfProperties = 0;
+		for (key in cat){
+			numberOfProperties += 1;
+		}
+		expect(numberOfProperties).toBe(2);
+	});
+
+	it("should know that she can exclude prototype properties using hasOwnProperties", function(){
+		var Cat =  function(name){
+			this.name = name;
+		};
+
+		Cat.prototype.meow = function(){
+			return "meow! I'm" + this.name;
+		}
+
+		var cat = new Cat();
+
+		var numberOfProperties = 0;
+		for (key in cat){
+			if (cat.hasOwnProperty(key)){
+				numberOfProperties += 1;
+			}
+		}
+		expect(numberOfProperties).toBe(1);
+	});
 });
 
 
