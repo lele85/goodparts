@@ -459,26 +459,62 @@ describe("A good JavaScript developer", function() {
         expect(obj.customProp).toBe("blabla");
     });
 
-    it("shoud be able to cache a function", function() {
+    it("shoud be able to write cached function", function() {
         function fact(n) {
             if (n < 0)
                 throw "Illegal argument";
             if (n === 0)
                 return 1;
-            if (fact.cache[n]){
+            if (fact.cache[n]) {
                 return fact.cache[n];
             } else {
                 fact.cache[n] = n * fact(n - 1);
                 return fact.cache[n];
             }
         }
-        fact.cache  = {};
-        
+        fact.cache = {};
+
         expect(fact(5)).toBe(120);
         expect(fact.cache[5]).toBe(120);
         expect(fact.cache[4]).toBe(24);
         expect(fact.cache[3]).toBe(6);
         expect(fact.cache[2]).toBe(2);
-        
+    });
+
+    it("should know that when a function is invoked as a method this is bound to the object", function() {
+        var obj = {
+            firstName: "Giovanni",
+            surname: "Barbone",
+            getFullName: function() {
+                return this.firstName + " " + this.surname;
+            },
+            changeSurname: function(newSurname) {
+                this.surname = newSurname || this.surname;
+                return this;
+            }
+        };
+
+        expect(obj.getFullName()).toBe("Giovanni Barbone");
+        expect(obj.changeSurname("Barbagianni").getFullName()).toBe("Giovanni Barbagianni");
+    });
+
+    it("should know that when a function is invoked as a function this is bound to the global object", function() {
+        function someFancyFunction() {
+            expect(this === global).toBe(true);
+        }
+        someFancyFunction();
+    });
+
+    it("should be able to implement a loop function with a callback", function() {
+        function loop(array, fn) {
+            for (var i = 0; i < array.length; i++) {
+                fn.call(array, array[i],i);
+            }
+        }
+        var num = 0;
+        loop([0, 1, 2], function(value,key) {
+            expect(value).toBe(num++);
+            expect(this instanceof Array).toBe(true);
+        });
     });
 });
