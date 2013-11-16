@@ -259,4 +259,97 @@ describe("A good JavaScript developer", function() {
        expect(salutation["english"]["morning"]).toBe("good morning");
        expect((salutation.spanish && salutation.spanish.morning) || "not supported").toBe("not supported");
     });
+    
+    /* JOHN RESIG */
+    
+    it("should be able to write and understand the Function.prototype.bind of prototype.js", function(){
+        var salutation = function(prefix, suffix){
+            return prefix + " " + this.name + suffix;
+        };
+        
+        var emanuele = {
+            name : "Emanuele"
+        };
+        
+        var simone = {
+            name : "Simone"
+        };
+        
+        Function.prototype.bind = function(){
+            var fn = this, args = Array.prototype.slice.call(arguments), obj = args.shift();
+            return function(){
+                return fn.apply(obj, Array.prototype.concat.call(args, Array.prototype.slice.call(arguments)));
+            };
+        };
+        
+        expect(salutation.bind(emanuele)("Hello","!!!")).toBe("Hello Emanuele!!!");
+        expect(salutation.bind(emanuele,"Hello","!!!")()).toBe("Hello Emanuele!!!");
+        expect(salutation.bind(emanuele,"Hello")("!!!")).toBe("Hello Emanuele!!!");
+        expect(salutation.bind(simone)("Hello","?")).toBe("Hello Simone?");        
+        
+        delete Function.prototype.bind;
+        
+        
+    });
+    
+    it("should be aware of variable and function hoisting", function(){
+        
+        expect(typeof hoistedFunctionVar === 'undefined').toBe(true);
+        expect(typeof hoistedFunction === 'function').toBe(true);
+        
+        function hoistedFunction(){};
+        var hoistedFunctionVar = function(){};
+    });
+    
+    it("should know that even if you can go below the return you can use hoisted functions ", function(){
+        function happyFunction(){
+            return stealthFunction();
+            
+            function stealthFunction() {
+                return "happy stealth";
+            };
+        };
+        expect(happyFunction()).toBe("happy stealth");
+    });
+    
+    it("should know that she can call a function by his name inside the function", function(){
+        function fact(n){
+            if ( n < 0) throw "Illegal argument";
+            if (n === 0) return 1;
+            return n * fact(n -1);
+        }
+        
+        expect(fact(4)).toBe(4*3*2*1);
+    });
+    
+    it("should know that you can name functions and assign them to variables, or do both", function(){
+        var myFirstName =  function myBuddyName(){
+            expect(myFirstName === myBuddyName).toBe(true);
+        };
+        expect(typeof myBuddyName).toBe('undefined');
+    });
+    
+    it("should know that you can refer to function names even if they are method of an object", function(){
+        var math = {
+            fact : function myFact(n){
+                if ( n < 0) throw "Illegal argument";
+                if (n === 0) return 1;
+                return n * myFact(n -1);
+            },
+            fact2 : function (n){
+                if ( n < 0) throw "Illegal argument";
+                if (n === 0) return 1;
+                return n * math.fact2(n -1);
+            },
+            fact3 : function (n){
+                if ( n < 0) throw "Illegal argument";
+                if (n === 0) return 1;
+                return n * this.fact3(n -1);
+            }
+        };
+        
+        expect(math.fact(4)).toBe(4*3*2*1);
+        expect(math.fact2(4)).toBe(4*3*2*1);
+        expect(math.fact3(4)).toBe(4*3*2*1);
+    });
 });
