@@ -1,5 +1,5 @@
 describe("A good JavaScript developer", function() {
-    
+
     /* DOUGLAS CROCKFORD*/
     it("should knows that block comments breaks in case of regExp", function() {
         var errorWithBlockComments = false;
@@ -701,4 +701,113 @@ describe("A good JavaScript developer", function() {
             }, 100);
         }
     });
+
+    it("should be able to use self calling functions to create a local scope", function() {
+        (function() {
+            var local = "blabla";
+            expect(local).toBe("blabla");
+        }());
+
+        expect(typeof local === "undefined").toBe(true);
+    });
+
+    it("should be able to execute an async loop tracking the correct index", function(done) {
+        var i = 0,
+                count = 3,
+                loopIndexes = [];
+
+        for (i; i < count; i++) {
+            (function(i) {
+                setTimeout(function() {
+                    loopIndexes.push(i);
+                    if (i === 2) {
+                        expect(loopIndexes[0]).toBe(0);
+                        expect(loopIndexes[1]).toBe(1);
+                        expect(loopIndexes[2]).toBe(2);
+                        done();
+                    }
+                }, 100);
+            }(i));
+        }
+    });
+
+    it("should know how to add something to function prototype and how that property is overwritten", function() {
+        function Person(name) {
+            this.firstName = name;
+        }
+        Person.prototype.getName = function() {
+            return this.firstName;
+        };
+
+        var emanuele = new Person("Emanuele");
+        expect(emanuele.getName()).toBe("Emanuele");
+        emanuele.getName = function() {
+            return "Pippo";
+        };
+        expect(emanuele.getName()).toBe("Pippo");
+        delete emanuele.getName;
+        expect(emanuele.getName()).toBe("Emanuele");
+    });
+
+    it("should know that prototype modifies every instance of the function, even if already istanciated", function() {
+        function Person(name) {
+            this.firstName = name;
+        }
+        Person.prototype.getName = function() {
+            return this.firstName;
+        };
+
+        var emanuele = new Person("Emanuele");
+        var simone = new Person("Simone");
+
+        expect(emanuele.getName()).toBe("Emanuele");
+        expect(simone.getName()).toBe("Simone");
+        expect(typeof emanuele.getAge === 'undefined').toBe(true);
+        expect(typeof simone.getAge === 'undefined').toBe(true);
+
+        Person.prototype.getAge = function() {
+            return 1000;
+        };
+
+        expect(emanuele.getAge()).toBe(1000);
+        expect(simone.getAge()).toBe(1000);
+    });
+
+    it("should know how to examine the basics of objects", function() {
+        function Person() {
+        }
+
+        var emanuele = new Person();
+
+        expect(typeof emanuele === 'object').toBe(true);
+        expect(emanuele instanceof Person).toBe(true);
+        expect(emanuele.constructor === Person).toBe(true);
+    });
+
+    it("should know that he can borrow the constructor from an istance", function() {
+        function Person() {
+        }
+
+        var emanuele = new Person();
+        var simone = new emanuele.constructor();
+
+        expect(emanuele instanceof Person).toBe(true);
+        expect(simone instanceof Person).toBe(true);
+    });
+    
+    it("should know how to not break prototype chain", function(){
+        function Person(){};
+        Person.prototype.dance = function(){};
+        
+        function Ninja(){};
+        Ninja.prototype = new Person();
+        
+        var ninja = new Ninja();
+        expect(ninja instanceof Person).toBe(true);
+        expect(ninja instanceof Ninja).toBe(true);
+        expect(ninja instanceof Object).toBe(true);
+        ninja.dance();
+        
+    });
+
 });
