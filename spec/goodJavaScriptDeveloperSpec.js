@@ -1,4 +1,6 @@
 describe("A good JavaScript developer", function() {
+    
+    /* DOUGLAS CROCKFORD*/
     it("should knows that block comments breaks in case of regExp", function() {
         var errorWithBlockComments = false;
         var errorWithSingleLineComments = false;
@@ -508,13 +510,195 @@ describe("A good JavaScript developer", function() {
     it("should be able to implement a loop function with a callback", function() {
         function loop(array, fn) {
             for (var i = 0; i < array.length; i++) {
-                fn.call(array, array[i],i);
+                fn.call(array, array[i], i);
             }
         }
         var num = 0;
-        loop([0, 1, 2], function(value,key) {
+        loop([0, 1, 2], function(value, i) {
             expect(value).toBe(num++);
             expect(this instanceof Array).toBe(true);
         });
+    });
+
+    it("should know what new operator does and what happen to this if you forget new", function() {
+        function Person(name) {
+            this.firstName = name;
+        }
+
+        //With new
+        var emanuele = new Person("Emanuele");
+        expect(emanuele.firstName).toBe("Emanuele");
+        expect(typeof global.firstName === 'undefined').toBe(true);
+
+        //Without new
+        var simone = Person("Simone");
+        expect(typeof simone === 'undefined').toBe(true);
+        expect(global.firstName).toBe("Simone");
+
+        delete global.firstName;
+    });
+
+    it("should know what she can guard new invocation inspecting this in constructor function", function() {
+        function Person(name) {
+            if ((this instanceof Person)) {
+                this.firstName = name;
+                return;
+            }
+            return new Person(name);
+        }
+
+        //With new
+        var emanuele = new Person("Emanuele");
+        expect(emanuele.firstName).toBe("Emanuele");
+        expect(typeof global.firstName === 'undefined').toBe(true);
+
+        //Without new
+        var simone = Person("Simone");
+        expect(simone.firstName).toBe("Simone");
+        expect(typeof global.firstName === 'undefined').toBe(true);
+
+    });
+
+    it("should know that she can defend constructor calls in a more generic way using arguments.callee", function() {
+        function Person(name) {
+            if ((this instanceof arguments.callee)) {
+                this.firstName = name;
+                return;
+            }
+            return new arguments.callee(name);
+        }
+
+        //With new
+        var emanuele = new Person("Emanuele");
+        expect(emanuele.firstName).toBe("Emanuele");
+        expect(typeof global.firstName === 'undefined').toBe(true);
+
+        //Without new
+        var simone = Person("Simone");
+        expect(simone.firstName).toBe("Simone");
+        expect(typeof global.firstName === 'undefined').toBe(true);
+    });
+
+    it("should know that he can write functions that can act on one or more arguments", function() {
+        function sum() {
+            var i = 0,
+                    sum = 0,
+                    count = arguments.length;
+            for (i; i < count; i++) {
+                sum += arguments[i];
+            }
+            return sum;
+        }
+
+        expect(sum(2)).toBe(2);
+        expect(sum(1, 2, 3, 4)).toBe(10);
+        expect(sum(2, 40)).toBe(42);
+    });
+
+    it("should be able to write a function to find the max numer on an array using math.max", function() {
+        function max(array) {
+            return Math.max.apply(Math, array);
+        }
+        ;
+
+        function min(array) {
+            return Math.min.apply(Math, array);
+        }
+        ;
+
+        expect(max([12, 4, 3, 78, 22, 21])).toBe(78);
+        expect(min([12, 4, 3, 78, 22, 21])).toBe(3);
+    });
+
+    it("should be able to understand that arguments is not an array and fund a way to convert it", function() {
+        function high() {
+            var args = Array.prototype.slice.call(arguments),
+                    ordered = args.sort(function(a, b) {
+                return a < b;
+            });
+            return ordered[0];
+        }
+
+        expect(high(3, 2, 5, 22, 4, 2)).toBe(22);
+        expect(high(3)).toBe(3);
+    });
+
+    it("should be able to implement a multimax function that multiplies the first element with the highest of the rest", function() {
+        function multiMax() {
+            var args = Array.prototype.slice.call(arguments),
+                    firstArg = args.shift(),
+                    maxOfTheRest = args.sort(function(a, b) {
+                return a < b;
+            })[0];
+            return firstArg * maxOfTheRest;
+        }
+
+        expect(multiMax(3, 2, 3, 4, 3, 2, 6)).toBe(18);
+        expect(multiMax(3, 2, 3, 4, 3, 2)).toBe(12);
+    });
+
+    it("should know that a function can see outside her scope creating a closure", function() {
+        var counter = 0;
+
+        function inc() {
+            counter += 1;
+            return counter;
+        }
+
+        expect(counter).toBe(0);
+        inc();
+        expect(counter).toBe(1);
+        inc();
+        inc();
+        inc();
+        expect(counter).toBe(4);
+    });
+
+    it("should be aware that closed variables are binded at invocation time", function() {
+        var number = 10;
+        function sum(otherNumber) {
+            return number + otherNumber;
+        }
+        ;
+
+        number = 15;
+        expect(sum(5)).toBe(20);
+    });
+
+    it("should know that she can use closures to obtain information hiding", function() {
+        var Person = function(name) {
+            var firstName = name;
+
+            this.getName = function() {
+                return firstName;
+            };
+        };
+
+        var emanuele = new Person("Emanuele");
+        expect(emanuele.getName()).toBe("Emanuele");
+        expect(typeof emanuele.firstName === 'undefined').toBe(true);
+    });
+
+    it("should be able to understand all the expectations of this test case", function() {
+        var a = 5;
+        function runMe(a) {
+            expect(a).toBe(6);
+
+            function innerRun() {
+                expect(b).toBe(7);
+                expect(typeof c === 'undefined').toBe(true);
+            }
+
+            var b = 7;
+            innerRun();
+            var c = 8;
+        }
+        runMe(6);
+
+        for (var d = 0; d < 3; d++) {
+            setTimeout(function() {
+                expect(d).toBe(3);
+            }, 100);
+        }
     });
 });
