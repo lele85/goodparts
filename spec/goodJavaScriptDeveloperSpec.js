@@ -794,19 +794,67 @@ describe("A good JavaScript developer", function() {
         expect(emanuele instanceof Person).toBe(true);
         expect(simone instanceof Person).toBe(true);
     });
-    
-    it("should know how to not break prototype chain", function(){
-        function Person(){};
-        Person.prototype.dance = function(){};
-        
-        function Ninja(){};
+
+    it("should know how to not break prototype chain", function() {
+        function Person() {
+        }
+
+        Person.prototype.dance = function() {
+        };
+
+        function Ninja() {
+        }
+
         Ninja.prototype = new Person();
-        
+
         var ninja = new Ninja();
         expect(ninja instanceof Person).toBe(true);
         expect(ninja instanceof Ninja).toBe(true);
         expect(ninja instanceof Object).toBe(true);
         ninja.dance();
+
+    });
+
+    it("should know the differences of __proto__ and prototype properties", function() {
+        function Point(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        var myPoint = new Point();
+        
+        expect(typeof myPoint.prototype === 'undefined').toBe(true);
+        expect(myPoint.__proto__ === Point.prototype).toBe(true);
+        expect(myPoint.__proto__.__proto__ === Object.prototype).toBe(true);
+        expect(myPoint instanceof Point).toBe(true);
+        expect(myPoint instanceof Object).toBe(true);
+    });
+    
+    it("should understan all the expectations of this test about a simple prototype chain", function(){
+        function Point(x,y){
+            this.x = x;
+            this.y = y;
+        }
+        
+        Point.prototype.translateX = function(amount){
+            this.x += amount;
+        };
+        
+        var a = new Point(1,2);
+        var b = new Point(3,4);
+        
+        expect(typeof a.prototype === 'undefined').toBe(true);
+        expect(typeof b.prototype === 'undefined').toBe(true);
+        expect(a.__proto__ === Point.prototype).toBe(true);
+        expect(b.__proto__ === Point.prototype).toBe(true);
+        expect(Point.__proto__ === Function.prototype).toBe(true);
+        expect(Point.prototype.__proto__ === Object.prototype).toBe(true);
+        expect(Function.prototype.__proto__ === Object.prototype).toBe(true);
+        expect(Object.prototype.__proto__).toBe(null);
+        
+        expect(Point.prototype.constructor === Point).toBe(true);
+        expect(Function.prototype.constructor === Function).toBe(true);
+        expect(Object.prototype.constructor === Object).toBe(true);
         
     });
 
