@@ -304,7 +304,7 @@ describe("A good JavaScript developer", function() {
 
         function hoistedFunction() {
         }
-        ;
+        
         var hoistedFunctionVar = function() {
         };
     });
@@ -659,7 +659,6 @@ describe("A good JavaScript developer", function() {
         function sum(otherNumber) {
             return number + otherNumber;
         }
-        ;
 
         number = 15;
         expect(sum(5)).toBe(20);
@@ -855,6 +854,48 @@ describe("A good JavaScript developer", function() {
         expect(Point.prototype.constructor === Point).toBe(true);
         expect(Function.prototype.constructor === Function).toBe(true);
         expect(Object.prototype.constructor === Object).toBe(true);
+        
+    });
+    
+    //Nodejs
+    it("Should understand how circular dependencies are treated in nodejs", function(){
+        var a = require('./circular_require/a');
+        var b = require('./circular_require/b');
+        
+        //Look inside a.js and b.js for expectations
+        expect(a.done).toBe(true);
+        expect(a.isInnerBDone()).toBe(true);
+        expect(b.done).toBe(true);
+        expect(b.isInnerADone()).toBe(true);
+    });
+    
+    it("Should know that module are chached by filename an not parsed over and over again, unless from other filenames", function(){
+        var firtsCounter = require("./shared_state_module/counter.js");
+        var secondCounter = require("./shared_state_module/counter.js");
+        
+        expect(firtsCounter.count).toBe(0);
+        expect(secondCounter.count).toBe(0);
+        
+        firtsCounter.count += 1;
+        
+        expect(firtsCounter.count).toBe(1);
+        expect(secondCounter.count).toBe(1);
+        
+        secondCounter.count += 1;
+        
+        expect(firtsCounter.count).toBe(2);
+        expect(secondCounter.count).toBe(2);
+        
+    });
+    
+    it("Should know that exports and module are passed via a self executing function and what that implies", function(){
+        var bad_module = require("./exports_and_module/bad_module.js");
+        expect(typeof bad_module.value).toBe('undefined');
+        var good_module = require("./exports_and_module/good_module.js");
+        expect(good_module.value).toBe("yeah!");
+    });
+    
+    xit("Should understand nextTick to defer execution in javascript event loop", function(){
         
     });
 
